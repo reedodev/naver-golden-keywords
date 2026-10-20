@@ -1,0 +1,21 @@
+{
+  "name": "naver-golden-keywords",
+  "owner": {
+    "name": "Reedo"
+  },
+  "metadata": {
+    "description": "Score Naver blog keywords by monthly searches vs. blog document count using the official Search Ad and Search APIs, with related-keyword discovery and S/A/B grades.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "naver-golden-keywords",
+      "description": "Score Naver blog keywords by monthly searches vs. blog document count using the official Search Ad and Search APIs, with related-keyword discovery and S/A/B grades.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/naver-golden-keywords"
+      ]
+    }
+  ]
+}
