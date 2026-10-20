@@ -29,7 +29,7 @@ import fs from 'node:fs';
 const argv = process.argv.slice(2);
 const flag = (k) => argv.includes('--' + k);
 const opt = (k, d) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : d; };
-const valued = new Set(['file', 'related', 'csv']);
+const valued = new Set(['file', 'related', 'csv', 'rules']);
 const seeds = [];
 for (let i = 0; i < argv.length; i++) {
   if (argv[i].startsWith('--')) { if (valued.has(argv[i].slice(2))) i++; continue; }
@@ -87,10 +87,11 @@ const BLOCK = ['사망', '추락', '살인', '자살', '성폭행', '성범죄',
 const CAUTION = ['증상', '효능', '부작용', '치료', '대출', '코인', '주식', '열애', '이혼', '루머', '논란', '사고', '사건', '체포', '별세', '부고', '사생활'];
 const flagOf = (kw) => (BLOCK.some((t) => kw.includes(t)) ? '제외' : CAUTION.some((t) => kw.includes(t)) ? '주의' : '');
 
+// --rules S:2000:0.1,A:1000:0.5,B:500:2  (grade:minMonthlySearches:maxRatio, checked in order)
+const RULES = (opt('rules') || 'S:2000:0.1,A:1000:0.5,B:500:2').split(',').map((r) => { const [g, v, x] = r.split(':'); return { g, v: Number(v), x: Number(x) }; });
+if (RULES.some((r) => !r.g || !Number.isFinite(r.v) || !Number.isFinite(r.x))) { console.error('--rules must look like S:2000:0.1,A:1000:0.5'); process.exit(2); }
 function grade(vol, ratio) {
-  if (vol >= 2000 && ratio <= 0.1) return 'S';
-  if (vol >= 1000 && ratio <= 0.5) return 'A';
-  if (vol >= 500 && ratio <= 2) return 'B';
+  for (const r of RULES) if (vol >= r.v && ratio <= r.x) return r.g;
   return '-';
 }
 
@@ -143,7 +144,7 @@ for (const t of targets) {
   await sleep(120);
 }
 
-const order = { S: 0, A: 1, B: 2, '-': 3, '?': 4 };
+const order = Object.fromEntries([...RULES.map((r) => r.g), '-', '?'].map((g, i) => [g, i]));
 targets.sort((a, b) => order[a.grade] - order[b.grade] || (a.ratio ?? 1e9) - (b.ratio ?? 1e9));
 
 if (opt('csv')) {
@@ -158,5 +159,5 @@ if (flag('json')) {
   for (const t of targets) {
     console.log(`${t.grade.padEnd(4)}  ${String(t.vol).padStart(8)}  ${String(t.docs ?? '?').padStart(9)}  ${String(t.ratio ?? '?').padStart(8)}   ${t.kw}${t.related ? ' (연관)' : ''}${t.flag ? ' [' + t.flag + ']' : ''}${t.noVolume ? ' (검색량 없음)' : ''}`);
   }
-  console.log(`\n${targets.filter((t) => 'SAB'.includes(t.grade)).length}/${targets.length} 개가 B등급 이상입니다. 검색량은 최근 30일 기준, 문서수는 조회 시점 기준입니다.`);
+  console.log(`\n${targets.filter((t) => RULES.some((r) => r.g === t.grade)).length}/${targets.length} 개가 등급 안에 들었습니다(기준: ${RULES.map((r) => r.g + ' ' + r.v + '+ / ' + r.x).join(', ')}). 검색량은 최근 30일 기준, 문서수는 조회 시점 기준입니다.`);
 }
