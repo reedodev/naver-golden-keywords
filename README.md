@@ -55,6 +55,12 @@ node skills/naver-golden-keywords/scripts/golden-keywords.mjs 캠핑의자 --rel
 
 `node tests/run.mjs`가 SKILL.md 형식을 검사하고 예시 파일로 스크립트를 실제로 실행합니다. 푸시할 때마다 GitHub Actions가 같은 시험을 돌립니다(위 test 배지).
 
+<!-- credits -->
+## 출처와 영감
+
+- **데이터 출처**: 네이버 검색광고 API의 키워드 도구([공식 문서](https://naver.github.io/searchad-apidoc/))와 네이버 개발자센터 검색 API의 블로그 검색([공식 문서](https://developers.naver.com/docs/serviceapi/search/blog/blog.md))만 씁니다. 각 API의 이용 약관과 호출 한도를 따릅니다.
+- **"황금키워드"라는 생각**: 검색량에 비해 글이 적은 키워드를 고르는 방식은 국내 블로거들 사이에서 널리 쓰이는 일반적인 방법입니다. S·A·B 등급 기준값은 작성자가 정한 것이고 `--rules`로 바꿀 수 있습니다.
+
 ## 만든 사람
 
 **리도**, AI 좌충우돌 실습 중인 20년차 엔지니어입니다. 매일 AI에게 일을 맡기다가 막힌 부분을 고쳐 가며 이 스킬을 만들었습니다.
@@ -67,5 +73,8 @@ node skills/naver-golden-keywords/scripts/golden-keywords.mjs 캠핑의자 --rel
 ## English
 
 Score Naver blog keywords by monthly searches vs. blog document count using the official Search Ad and Search APIs, with related-keyword discovery and S/A/B grades.
+
+**Credits.**
+- Data comes only from the official Naver Search Ad API ([docs](https://naver.github.io/searchad-apidoc/)) and Naver Search API for blogs ([docs](https://developers.naver.com/docs/serviceapi/search/blog/blog.md)). The "golden keyword" idea is common practice among Korean bloggers; the grade thresholds are the author's own and configurable.
 
 Install: `/plugin marketplace add reedodev/naver-golden-keywords` then `/plugin install naver-golden-keywords@naver-golden-keywords`, or copy `skills/naver-golden-keywords` into `~/.claude/skills/`. See [SKILL.md](skills/naver-golden-keywords/SKILL.md) for the full procedure. MIT License; third-party models, fonts and libraries keep their own licenses.
