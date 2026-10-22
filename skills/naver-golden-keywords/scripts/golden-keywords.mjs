@@ -64,7 +64,7 @@ async function keywordTool(hints) {
     const url = `https://api.searchad.naver.com${uri}?hintKeywords=${hints.map((h) => encodeURIComponent(h.replace(/\s+/g, ''))).join(',')}&showDetail=1`;
     const r = await fetch(url, { headers: { 'X-Timestamp': ts, 'X-API-KEY': E.NAVER_AD_API_KEY, 'X-Customer': String(E.NAVER_AD_CUSTOMER_ID), 'X-Signature': sig } });
     if (r.status === 429) { await sleep(1000 * (attempt + 1)); continue; }
-    if (!r.ok) throw new Error(`searchad HTTP ${r.status}: ${(await r.text()).slice(0, 120)}`);
+    if (!r.ok) throw new Error(`searchad HTTP ${r.status} (check the Search Ad API key, secret and customer ID; response body not shown so keys are never echoed)`);
     return (await r.json()).keywordList || [];
   }
   throw new Error('searchad rate limited');
@@ -76,7 +76,7 @@ async function blogTotal(kw) {
       headers: { 'X-Naver-Client-Id': E.NAVER_CLIENT_ID, 'X-Naver-Client-Secret': E.NAVER_CLIENT_SECRET },
     });
     if (r.status === 429) { await sleep(1000 * (attempt + 1)); continue; }
-    if (!r.ok) throw new Error(`openapi HTTP ${r.status}: ${(await r.text()).slice(0, 120)}`);
+    if (!r.ok) throw new Error(`openapi HTTP ${r.status} (check the Naver developer Client ID and secret; response body not shown so keys are never echoed)`);
     return Number((await r.json()).total) || 0;
   }
   throw new Error('openapi rate limited');
@@ -104,6 +104,7 @@ if (SELF_TEST) {
 }
 
 // ---------- main ----------
+process.on('uncaughtException', (e) => { console.error('error: ' + e.message); process.exit(1); });
 const related = Number(opt('related', 0));
 const volumes = new Map(); // norm -> {kw, pc, mo, comp}
 const relatedPool = [];
